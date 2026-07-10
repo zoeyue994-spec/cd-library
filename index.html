@@ -399,16 +399,50 @@ select:focus { border-color: var(--red); }
   position: relative;
   margin-bottom: 16px;
 }
-.modal-cover img {
+
+/* slot reel */
+.reel-track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  will-change: transform;
+}
+.reel-frame {
+  width: 100%;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  position: relative;
+  background: #e8e8ed;
+}
+.reel-frame img {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
 }
-.modal-cover .cover-placeholder {
+.reel-frame .cover-placeholder {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 6px;
+}
+
+/* top & bottom fade edges inside the cover window */
+.modal-cover::before,
+.modal-cover::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 28%;
+  z-index: 2;
+  pointer-events: none;
+}
+.modal-cover::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(232,232,237,0.85), transparent);
+}
+.modal-cover::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(232,232,237,0.85), transparent);
 }
 
 .modal-artist {
@@ -456,6 +490,7 @@ select:focus { border-color: var(--red); }
   gap: 5px;
 }
 .modal-pick-again:hover { background: #e8e8ed; }
+.modal-pick-again:disabled { opacity: 0.45; cursor: default; }
 
 .modal-am-btn {
   flex: 1;
@@ -527,6 +562,9 @@ select:focus { border-color: var(--red); }
   .controls { flex-direction: column; align-items: stretch; gap: 8px; }
   .search-wrap { max-width: 100%; }
   .sort-wrap { margin-left: 0; }
+  /* Random btn: icon-only square on mobile */
+  .random-btn { padding: 7px 10px; }
+  .random-btn .random-label { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -565,7 +603,7 @@ select:focus { border-color: var(--red); }
         <polyline points="21 16 21 21 16 21"></polyline>
         <line x1="15" y1="15" x2="21" y2="21"></line>
       </svg>
-      隨機
+      <span class="random-label">隨機</span>
     </button>
   </div>
 </header>
@@ -576,9 +614,9 @@ select:focus { border-color: var(--red); }
     <button class="modal-close" id="modal-close" title="關閉">✕</button>
     <div class="modal-label">🎲 今天來聽這張！</div>
     <div class="modal-cover" id="modal-cover">
-      <div class="cover-placeholder">
-        <span class="ph-note">♪</span>
-        <span class="ph-label" id="modal-cover-label"></span>
+      <!-- slot reel: frames scroll vertically inside this clipping window -->
+      <div class="reel-track" id="reel-track">
+        <!-- frames injected by JS -->
       </div>
     </div>
     <div class="modal-artist" id="modal-artist"></div>
@@ -939,68 +977,185 @@ function setCover(wrap, url) {
 const randomOverlay  = document.getElementById('random-overlay');
 const modalClose     = document.getElementById('modal-close');
 const modalCover     = document.getElementById('modal-cover');
-const modalCoverLbl  = document.getElementById('modal-cover-label');
+const reelTrack      = document.getElementById('reel-track');
 const modalArtist    = document.getElementById('modal-artist');
 const modalAlbum     = document.getElementById('modal-album');
 const modalMeta      = document.getElementById('modal-meta');
 const modalAmLink    = document.getElementById('modal-am-link');
 const modalPickAgain = document.getElementById('modal-pick-again');
 
-function pickRandom() {
-  const idx = Math.floor(Math.random() * data.length);
-  const d   = data[idx];
-  const m   = d.meta;
+let reelBusy = false;
 
-  // cover
-  // clear previous img
-  const prevImg = modalCover.querySelector('img');
-  if (prevImg) prevImg.remove();
-  const ph = modalCover.querySelector('.cover-placeholder');
-  if (ph) ph.style.display = '';
-  modalCoverLbl.textContent = d.artist;
+// Build a reel frame element for a given album entry
+function makeFrame(d) {
+  const frame = document.createElement('div');
+  frame.className = 'reel-frame';
 
-  // text
+  const ph = document.createElement('div');
+  ph.className = 'cover-placeholder';
+  ph.innerHTML = `<span class="ph-note">♪</span><span class="ph-label">${esc(d.artist)}</span>`;
+  frame.appendChild(ph);
+
+  // If cover already in cache, put it in immediately
+  const key = d.artist + '||' + d.album;
+  const cachedUrl = STATIC_COVERS[key] || (coverCache[key] || null);
+  if (cachedUrl) {
+    const img = document.createElement('img');
+    img.src = cachedUrl;
+    img.alt = d.album;
+    img.onload = () => { ph.style.display = 'none'; };
+    frame.appendChild(img);
+  }
+  return frame;
+}
+
+// Easing: ease-out cubic
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+// Animate the reel: scroll through `frames` list, landing on the last one
+function animateReel(frames, onDone) {
+  // Each frame is 100% of the container height (aspect-ratio:1 square)
+  // We measure actual pixel height from the container
+  const H = modalCover.offsetHeight || modalCover.getBoundingClientRect().height || 280;
+
+  // Build the track: frames already in DOM
+  // Total distance to scroll = (frames.length - 1) * H  (stop at last frame)
+  const totalFrames = frames.length;
+  const totalDist   = (totalFrames - 1) * H;
+
+  // Animation timing
+  const DURATION = 1000 + totalFrames * 18; // ~1.6–2s depending on count
+
+  let startTime = null;
+
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    const t = Math.min(elapsed / DURATION, 1);
+    const eased = easeOutCubic(t);
+    const currentY = -(eased * totalDist);
+
+    reelTrack.style.transform = `translateY(${currentY}px)`;
+
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      reelTrack.style.transform = `translateY(${-totalDist}px)`;
+      onDone();
+    }
+  }
+
+  reelTrack.style.transform = 'translateY(0)';
+  requestAnimationFrame(step);
+}
+
+function showResult(d) {
+  const m = d.meta;
   modalArtist.textContent = d.artist;
   modalAlbum.textContent  = d.album;
-
   const tagStyle = `background:${m.color}18;color:${m.color};`;
   modalMeta.innerHTML = `
     <span class="genre-chip" style="${tagStyle}">${esc(d.genre)}</span>
     <span class="card-year">${esc(d.year)}</span>
     ${d.label ? `<span class="card-year">${esc(d.label)}</span>` : ''}
   `;
-
-  // Apple Music link
   if (d.url) {
     modalAmLink.href = d.url;
     modalAmLink.classList.remove('hidden');
   } else {
     modalAmLink.classList.add('hidden');
   }
+}
 
-  // load cover image
-  const key = d.artist + '||' + d.album;
-  if (STATIC_COVERS[key]) {
-    setCover(modalCover, STATIC_COVERS[key]);
-  } else if (coverCache[key]) {
-    setCover(modalCover, coverCache[key]);
-  } else {
-    fetchCover(modalCover, d.artist, d.album, d.url, key);
+function pickRandom() {
+  if (reelBusy) return;
+  reelBusy = true;
+  modalPickAgain.disabled = true;
+
+  // Pick winner
+  const winIdx = Math.floor(Math.random() * data.length);
+  const winner = data[winIdx];
+
+  // Clear text during spin
+  modalArtist.textContent = '';
+  modalAlbum.textContent  = '';
+  modalMeta.innerHTML     = '';
+  modalAmLink.classList.add('hidden');
+
+  // Build a random sequence of ~12–16 entries ending with winner
+  const SPIN_COUNT = 12 + Math.floor(Math.random() * 5);
+  const sequence = [];
+  const pool = data.filter((_, i) => i !== winIdx);
+  for (let i = 0; i < SPIN_COUNT; i++) {
+    sequence.push(pool[Math.floor(Math.random() * pool.length)]);
   }
+  sequence.push(winner); // last frame = winner
+
+  // Build DOM frames
+  reelTrack.innerHTML = '';
+  reelTrack.style.transform = 'translateY(0)';
+  sequence.forEach(d => reelTrack.appendChild(makeFrame(d)));
+
+  animateReel(sequence, () => {
+    // Animation done — reveal result text
+    showResult(winner);
+    // Also try fetching winner cover if not yet loaded (last frame)
+    const key = winner.artist + '||' + winner.album;
+    const lastFrame = reelTrack.lastElementChild;
+    if (!lastFrame.querySelector('img')) {
+      if (STATIC_COVERS[key]) {
+        setCoverFrame(lastFrame, STATIC_COVERS[key]);
+      } else if (coverCache[key]) {
+        setCoverFrame(lastFrame, coverCache[key]);
+      } else {
+        fetchCoverFrame(lastFrame, winner);
+      }
+    }
+    reelBusy = false;
+    modalPickAgain.disabled = false;
+  });
+}
+
+// setCover variant that works on a reel frame (no dataset needed)
+function setCoverFrame(frame, url) {
+  if (!url || frame.querySelector('img')) return;
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = '';
+  img.onload = () => {
+    const ph = frame.querySelector('.cover-placeholder');
+    if (ph) ph.style.display = 'none';
+  };
+  img.onerror = () => img.remove();
+  frame.appendChild(img);
+}
+
+async function fetchCoverFrame(frame, d) {
+  const key   = d.artist + '||' + d.album;
+  const amUrl = d.url || '';
+  try {
+    let imgUrl = null;
+    const appleId = extractAppleId(amUrl);
+    if (appleId) imgUrl = await iTunesLookup(appleId);
+    if (!imgUrl) {
+      const cleanArtist = d.artist.replace(/^[\u4e00-\u9fff\u3040-\u30ff]+\s+/,'').trim();
+      const cleanAlbum  = d.album.replace(/\(.*?\)/g,'').replace(/（.*?）/g,'')
+                           .replace(/\s*[–-]\s*EP$/i,'').replace(/\s+/g,' ').trim();
+      imgUrl = await iTunesSearch(`${cleanArtist} ${cleanAlbum}`);
+      if (!imgUrl) imgUrl = await iTunesSearch(cleanAlbum);
+    }
+    coverCache[key] = imgUrl || null;
+    if (imgUrl) setCoverFrame(frame, imgUrl);
+  } catch(e) { coverCache[key] = null; }
 }
 
 document.getElementById('random-btn').addEventListener('click', () => {
-  pickRandom();
   randomOverlay.classList.add('open');
+  // small delay so overlay fade-in renders before reel starts
+  setTimeout(pickRandom, 80);
 });
 
 modalPickAgain.addEventListener('click', () => {
-  // mini shake animation on modal
-  const modal = document.getElementById('random-modal');
-  modal.style.animation = 'none';
-  requestAnimationFrame(() => {
-    modal.style.animation = 'modalPop 0.2s cubic-bezier(0.34,1.56,0.64,1)';
-  });
   pickRandom();
 });
 
