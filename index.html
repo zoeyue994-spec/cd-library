@@ -367,7 +367,7 @@ select:focus { border-color: var(--red); }
       </svg>
       <input type="text" id="search" placeholder="搜尋 artist 或專輯…" autocomplete="off" spellcheck="false">
     </div>
-    <div class="chips-wrap" id="genre-chips"></div>
+    <div class="chips-wrap" id="alpha-chips"></div>
     <div class="sort-wrap">
       <span class="sort-label">排序</span>
       <select id="sort-select">
@@ -400,7 +400,7 @@ const RAW = [
   ["Black Sabbath","Iron Man: The Best of Black Sabbath","2012","Metal","Universal","https://music.apple.com/us/album/iron-man-the-best-of-black-sabbath/571799490"],
   ["Calvin Harris","Funk Wav Bounces Vol. 1","2017","Dance","Columbia","https://music.apple.com/us/album/funk-wav-bounces-vol-1/1440833081"],
   ["Chilli Beans.","Chilli Beans.","2022","J-Pop","A.S.A.B","https://music.apple.com/us/album/chilli-beans/1629402603"],
-  ["Chilli Beans.","For you","2022","J-Pop","A.S.A.B",""],
+  ["Chilli Beans.","For you","2022","J-Pop","A.S.A.B","https://music.apple.com/tw/album/for-you-ep/1696578814"],
   ["The Cranberries","No Need to Argue","1994","Rock","Island","https://music.apple.com/us/album/no-need-to-argue/718631023"],
   ["The Dave Brubeck Quartet","Time Out","1959","Jazz","Columbia","https://music.apple.com/us/album/time-out/268447948"],
   ["Deep Purple","Made in Japan","1972","Rock","WMG","https://music.apple.com/us/album/made-in-japan-deluxe-edition-live/879738770"],
@@ -412,10 +412,10 @@ const RAW = [
   ["Hiromi","BLUE GIANT","2023","Jazz","Universal","https://music.apple.com/us/album/blue-giant-original-motion-picture-soundtrack/1667443039"],
   ["Jack Johnson","Curious George","2006","Soundtrack","Republic","https://music.apple.com/us/album/sing-a-longs-and-lullabies-for-the-film/1424723863"],
   ["James Blunt","All the Lost Souls (Deluxe)","2008","Pop Rock","WMG","https://music.apple.com/us/album/all-the-lost-souls-deluxe-edition/1615822765"],
-  ["大竹研 Ken Ohtake","KEN","2019","Alternative","Now Music",""],
+  ["大竹研 Ken Ohtake","KEN","2019","Alternative","Now Music","https://music.apple.com/tw/album/ken/1487088609"],
   ["Led Zeppelin","IV (Remastered)","1971","Rock","WMG","https://music.apple.com/us/album/led-zeppelin-iv-remastered/580708175"],
   ["The Marías","CINEMA","2021","Alternative","Atlantic","https://music.apple.com/us/album/cinema/1563957170"],
-  ["Makoto Okazaki","Sea","2015","Alternative","自發行",""],
+  ["Makoto Okazaki","Sea","2015","Alternative","自發行","https://music.apple.com/tw/album/sea/959837272"],
   ["Matt Maltese","Hers","2025","Alternative","The Orchard","https://music.apple.com/us/album/hers/1795998438"],
   ["Men I Trust","Oncle Jazz","2019","Pop","自發行","https://music.apple.com/us/album/oncle-jazz/1473993015"],
   ["Miles Davis","Sketches of Spain","1960","Jazz","Columbia","https://music.apple.com/us/album/sketches-of-spain/832060615"],
@@ -426,7 +426,7 @@ const RAW = [
   ["福居良 Ryo Fukui","Scenery（2005 重發）","1976 / 2005","Jazz","SOLID","https://music.apple.com/us/album/scenery/1329457232"],
   ["福居良 Ryo Fukui","Mellow Dream（2016 版）","2006","Jazz","SOLID","https://music.apple.com/us/album/mellow-dream/1329458465"],
   ["福居良 Ryo Fukui","Scenery (1976)","2022","Jazz","SOLID","https://music.apple.com/us/album/scenery/1329457232"],
-  ["福居良 Ryo Fukui","Best of Ryo Fukui","2022","Jazz","SOLID",""],
+  ["福居良 Ryo Fukui","Best of Ryo Fukui","2022","Jazz","SOLID","https://music.apple.com/tw/album/%E3%82%B7%E3%83%BC%E3%83%8A%E3%83%AA%E3%82%A3-%E3%82%AA%E3%83%96-%E3%82%B8%E3%83%A3%E3%83%91%E3%83%8B%E3%83%BC%E3%82%BA-%E3%82%B8%E3%83%A3%E3%82%BA-%E3%83%99%E3%82%B9%E3%83%88-%E3%82%AA%E3%83%96-%E7%A6%8F%E5%B1%85%E8%89%AF-remastered/1637587384"],
   ["Sampha","Process","2017","Electronic","Young Turks","https://music.apple.com/us/album/process/1138217713"],
   ["Stan Getz and Joao Gilberto","Getz/Gilberto","2014","Jazz","WMG","https://music.apple.com/us/album/getz-gilberto/268463560"],
   ["Theodore Shapiro","Severance: Season 2 OST","2025","Soundtrack","Lakeshore","https://music.apple.com/us/album/severance-season-2-apple-tv-original-series-soundtrack/1803471256"],
@@ -440,13 +440,13 @@ const RAW = [
   ["蛋堡 Soft Lipa","收斂水","2009","華語嘻哈","顏社","https://music.apple.com/tw/album/%E6%94%B6%E6%96%82%E6%B0%B4/1178538439"],
   ["蛋堡 Soft Lipa","Winter Sweet","2009","華語嘻哈","顏社","https://music.apple.com/hk/album/winter-sweet/1172719989"],
   ["草東沒有派對","醜奴兒","2016","獨立搖滾","自發行","https://music.apple.com/tw/album/%E9%86%9C%E5%A5%B4%E5%85%92/1676735354"],
-  ["巨大的轟鳴","登鸛雀樓 – EP","2014","獨立搖滾","SME",""],
+  ["巨大的轟鳴","登鸛雀樓 – EP","2014","獨立搖滾","SME","https://music.apple.com/tw/album/%E7%99%BB%E9%B8%9B%E9%9B%80%E6%A8%93-ep/888637605"],
   ["國蛋 GorDoN","GDNA","2023","華語嘻哈","顏社","https://music.apple.com/tw/album/gdna/1671993254"],
   ["生祥樂隊","菊花夜行軍：15週年紀念演唱會現場錄音","2017","台灣民謠","大大樹","https://music.apple.com/tw/album/%E8%8F%8A%E8%8A%B1%E5%A4%9C%E8%A1%8C%E8%BB%8D-15%E9%80%B1%E5%B9%B4%E5%85%A8%E6%96%B0%E6%B7%B7%E9%9F%B3%E7%89%88/1240790450"],
   ["謊言留聲機","未來雛形","2012","電子音樂","亞神","https://music.apple.com/tw/album/%E6%9C%AA%E4%BE%86%E9%9B%9B%E5%BD%A2/1861428154"],
   ["李英宏","台北直直撞","2016","華語流行樂","顏社","https://music.apple.com/tw/album/%E5%8F%B0%E5%8C%97%E7%9B%B4%E7%9B%B4%E6%92%9E/1112089754"],
   ["盧廣仲 Crowd Lu","這就是Rock'N Roll 的Style Live in TICC","2009","華語流行樂","添翼音樂","https://music.apple.com/gb/album/live-in-ticc-%E9%80%99%E5%B0%B1%E6%98%AFrockn-roll%E7%9A%84style/799309368"],
-  ["東京中央線","Fly by Light","2020","Contemporary Jazz","Foothills Folk LLC",""],
+  ["東京中央線","Fly by Light","2020","Contemporary Jazz","Foothills Folk LLC","https://music.apple.com/tw/album/fly-by-light/1545338280"],
   ["陳嫺靜","如果每天都可以 happy happy 誰想要sad:*合作的秘密","2025","華語嘻哈","顏社","https://music.apple.com/us/album/%E5%A6%82%E6%9E%9C%E6%AF%8F%E5%A4%A9%E9%83%BD%E5%8F%AF%E4%BB%A5-happy-happy-%E8%AA%B0%E6%83%B3%E8%A6%81sad-%E4%B8%80%E8%B5%B7%E5%8E%BB%E5%BA%A6%E5%81%87/1799903617"],
   ["伍佰 & China Blue","釘子花","2016","華語搖滾","Universal Music Taiwan","https://music.apple.com/tw/album/%E9%87%98%E5%AD%90%E8%8A%B1/1443156439"],
   ["裝咖人","夜官巡場","2021","獨立流行樂","風潮音樂","https://music.apple.com/tw/album/%E5%A4%9C%E5%AE%98%E5%B7%A1%E5%A0%B4/1594803360"],
@@ -485,26 +485,54 @@ const data = RAW.map(([artist, album, year, genre, label, url]) => ({
   sortYear: parseInt(year) || 0,
 }));
 
-// ── Unique genres by count ──
-const genreCount = {};
-data.forEach(d => { genreCount[d.genre] = (genreCount[d.genre]||0)+1; });
-const genres = Object.entries(genreCount).sort((a,b)=>b[1]-a[1]).map(([g])=>g);
+// ── Alpha index ──
+// For each artist: strip leading "The/A/An", take first char.
+// CJK first char → bucket "中文"
+function alphaKey(artist) {
+  const stripped = artist.replace(/^(The |A |An )/i, '').trim();
+  const first = stripped[0] || '#';
+  // CJK Unified / CJK Extension / Hiragana / Katakana / Hangul
+  if (/[\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]/.test(first)) return '中文';
+  if (/[A-Z]/i.test(first)) return first.toUpperCase();
+  return '#';
+}
 
-// ── Build genre chips ──
-let activeGenres = new Set();
-const chipsWrap = document.getElementById('genre-chips');
-genres.forEach(g => {
-  const m = genreMeta(g);
+// Attach alphaKey to each item
+data.forEach(d => { d.alpha = alphaKey(d.artist); });
+
+// Build ordered list of active letters
+const alphaCount = {};
+data.forEach(d => { alphaCount[d.alpha] = (alphaCount[d.alpha]||0)+1; });
+const ALPHA_ORDER = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '中文', '#'];
+const activeAlphas = ALPHA_ORDER.filter(a => alphaCount[a]);
+
+// State
+let activeAlpha = null; // null = show all
+
+const chipsWrap = document.getElementById('alpha-chips');
+
+// "全部" chip
+const allBtn = document.createElement('button');
+allBtn.className = 'chip active';
+allBtn.textContent = '全部';
+allBtn.dataset.alpha = '';
+chipsWrap.appendChild(allBtn);
+
+activeAlphas.forEach(a => {
   const btn = document.createElement('button');
   btn.className = 'chip';
-  btn.dataset.genre = g;
-  btn.innerHTML = `<span class="chip-dot" style="background:${m.color}"></span>${g}<span class="chip-n">${genreCount[g]}</span>`;
-  btn.addEventListener('click', () => {
-    if (activeGenres.has(g)) { activeGenres.delete(g); btn.classList.remove('active'); }
-    else { activeGenres.add(g); btn.classList.add('active'); }
-    render();
-  });
+  btn.dataset.alpha = a;
+  btn.innerHTML = `${a}<span class="chip-n">${alphaCount[a]}</span>`;
   chipsWrap.appendChild(btn);
+});
+
+chipsWrap.addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  chipsWrap.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeAlpha = btn.dataset.alpha || null;
+  render();
 });
 
 // ── Search & sort ──
@@ -519,7 +547,7 @@ const AM_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentCo
 // ── Render ──
 function render() {
   let items = data.filter(d => {
-    if (activeGenres.size > 0 && !activeGenres.has(d.genre)) return false;
+    if (activeAlpha && d.alpha !== activeAlpha) return false;
     if (searchVal) {
       const hay = (d.artist+d.album+d.genre+d.label).toLowerCase();
       if (!hay.includes(searchVal)) return false;
@@ -554,7 +582,7 @@ function render() {
       : '';
     return `
     <div class="card">
-      <div class="cover-wrap" data-artist="${esc(d.artist)}" data-album="${esc(d.album)}">
+      <div class="cover-wrap" data-artist="${esc(d.artist)}" data-album="${esc(d.album)}" data-amurl="${esc(d.url)}">
         <div class="cover-placeholder">
           <span class="ph-note">♪</span>
           <span class="ph-label">${esc(d.artist)}</span>
@@ -580,7 +608,8 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Cover loading via iTunes Search API ──
+// ── Cover loading ──
+// Priority: Apple Music ID lookup (exact) → iTunes keyword search (fallback)
 const coverCache = {};
 
 async function loadCovers() {
@@ -588,35 +617,45 @@ async function loadCovers() {
   for (const wrap of wraps) {
     const artist = wrap.dataset.artist;
     const album  = wrap.dataset.album;
+    const amUrl  = wrap.dataset.amurl || '';
     const key    = artist + '||' + album;
 
-    if (coverCache[key]) {
-      setCover(wrap, coverCache[key]);
-      continue;
-    }
-    if (coverCache[key] === null) continue; // already failed
+    if (coverCache[key]) { setCover(wrap, coverCache[key]); continue; }
+    if (coverCache[key] === null) continue;
 
-    await sleep(150); // stagger to avoid rate-limiting
-    fetchCover(wrap, artist, album, key);
+    await sleep(150);
+    fetchCover(wrap, artist, album, amUrl, key);
   }
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-async function fetchCover(wrap, artist, album, key) {
+// Extract numeric ID from any music.apple.com URL
+function extractAppleId(url) {
+  if (!url) return null;
+  const m = url.match(/\/(\d+)(?:\?|$)/);
+  return m ? m[1] : null;
+}
+
+async function fetchCover(wrap, artist, album, amUrl, key) {
   try {
-    // Strip parenthetical suffixes & special chars for cleaner search
-    const cleanArtist = artist.replace(/^[^\x00-\x7F\u3000-\u9FFF]+\s+/,'').trim(); // prefer latin part if mixed
-    const cleanAlbum  = album
-      .replace(/\(.*?\)/g,'').replace(/（.*?）/g,'')
-      .replace(/[：:–\-]\s*EP$/i,'').replace(/\s+/g,' ').trim();
+    let imgUrl = null;
 
-    // Try 1: artist + album
-    let imgUrl = await iTunesSearch(`${cleanArtist} ${cleanAlbum}`);
+    // ── Strategy 1: ID lookup (precise, uses Apple Music URL) ──
+    const appleId = extractAppleId(amUrl);
+    if (appleId) {
+      imgUrl = await iTunesLookup(appleId);
+    }
 
-    // Try 2: album only (helps when artist name is CJK-heavy)
-    if (!imgUrl && cleanAlbum.length > 1) {
-      imgUrl = await iTunesSearch(cleanAlbum);
+    // ── Strategy 2: keyword search (fallback for missing URLs) ──
+    if (!imgUrl) {
+      const cleanArtist = artist.replace(/^[\u4e00-\u9fff\u3040-\u30ff]+\s+/,'').trim();
+      const cleanAlbum  = album
+        .replace(/\(.*?\)/g,'').replace(/（.*?）/g,'')
+        .replace(/\s*[–-]\s*EP$/i,'').replace(/\s+/g,' ').trim();
+
+      imgUrl = await iTunesSearch(`${cleanArtist} ${cleanAlbum}`);
+      if (!imgUrl) imgUrl = await iTunesSearch(cleanAlbum);
     }
 
     coverCache[key] = imgUrl || null;
@@ -630,13 +669,23 @@ async function fetchCover(wrap, artist, album, key) {
   } catch(e) { coverCache[key] = null; }
 }
 
+async function iTunesLookup(id) {
+  const res = await fetch(`https://itunes.apple.com/lookup?id=${id}&entity=album`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const result = data.results?.find(r => r.wrapperType === 'collection' || r.collectionType === 'Album')
+               ?? data.results?.[0];
+  if (!result?.artworkUrl100) return null;
+  return result.artworkUrl100.replace('100x100bb', '600x600bb');
+}
+
 async function iTunesSearch(term) {
-  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=1&media=music`;
-  const res = await fetch(url);
+  const res = await fetch(
+    `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=1&media=music`
+  );
   if (!res.ok) return null;
   const data = await res.json();
   if (!data.resultCount) return null;
-  // artwork: replace 100x100 → 600x600 for crisp display
   return data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
 }
 
