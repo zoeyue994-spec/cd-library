@@ -580,7 +580,7 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Cover loading ──
+// ── Cover loading via iTunes Search API ──
 const coverCache = {};
 
 async function loadCovers() {
@@ -596,8 +596,7 @@ async function loadCovers() {
     }
     if (coverCache[key] === null) continue; // already failed
 
-    // stagger requests
-    await sleep(120);
+    await sleep(150); // stagger to avoid rate-limiting
     fetchCover(wrap, artist, album, key);
   }
 }
@@ -606,36 +605,39 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function fetchCover(wrap, artist, album, key) {
   try {
-    // clean up album title for search (remove parenthetical notes)
-    const cleanAlbum = album.replace(/\(.*?\)/g,'').replace(/（.*?）/g,'').trim();
-    const q = encodeURIComponent(`artist:"${artist}" release:"${cleanAlbum}"`);
-    const mbRes = await fetch(
-      `https://musicbrainz.org/ws/2/release/?query=${q}&fmt=json&limit=3`,
-      { headers: { 'User-Agent': 'CDLibrary/1.0 (personal-collection)' } }
+    // Strip parenthetical suffixes & special chars for cleaner search
+    const cleanArtist = artist.replace(/^[^\x00-\x7F\u3000-\u9FFF]+\s+/,'').trim(); // prefer latin part if mixed
+    const cleanAlbum  = album
+      .replace(/\(.*?\)/g,'').replace(/（.*?）/g,'')
+      .replace(/[：:–\-]\s*EP$/i,'').replace(/\s+/g,' ').trim();
+
+    // Try 1: artist + album
+    let imgUrl = await iTunesSearch(`${cleanArtist} ${cleanAlbum}`);
+
+    // Try 2: album only (helps when artist name is CJK-heavy)
+    if (!imgUrl && cleanAlbum.length > 1) {
+      imgUrl = await iTunesSearch(cleanAlbum);
+    }
+
+    coverCache[key] = imgUrl || null;
+    if (!imgUrl) return;
+
+    const live = document.querySelector(
+      `.cover-wrap[data-artist="${CSS.escape(artist)}"][data-album="${CSS.escape(album)}"]`
     );
-    if (!mbRes.ok) { coverCache[key] = null; return; }
-
-    const mbData = await mbRes.json();
-    if (!mbData.releases?.length) { coverCache[key] = null; return; }
-
-    const mbid = mbData.releases[0].id;
-    await sleep(80);
-
-    const caaRes = await fetch(`https://coverartarchive.org/release/${mbid}`);
-    if (!caaRes.ok) { coverCache[key] = null; return; }
-
-    const caaData = await caaRes.json();
-    const front = caaData.images?.find(i => i.front) ?? caaData.images?.[0];
-    if (!front) { coverCache[key] = null; return; }
-
-    const imgUrl = front.thumbnails?.['500'] ?? front.thumbnails?.large ?? front.image;
-    coverCache[key] = imgUrl;
-
-    // find the wrap again (might have re-rendered)
-    const live = document.querySelector(`.cover-wrap[data-artist="${CSS.escape(artist)}"][data-album="${CSS.escape(album)}"]`);
     if (live) setCover(live, imgUrl);
 
   } catch(e) { coverCache[key] = null; }
+}
+
+async function iTunesSearch(term) {
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=album&limit=1&media=music`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data.resultCount) return null;
+  // artwork: replace 100x100 → 600x600 for crisp display
+  return data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
 }
 
 function setCover(wrap, url) {
