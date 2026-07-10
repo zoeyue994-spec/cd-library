@@ -333,15 +333,15 @@ select:focus { border-color: var(--red); }
 .random-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: var(--red);
   color: #fff;
   border: none;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 600;
-  padding: 7px 14px;
-  border-radius: 10px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.12s, transform 0.1s;
   white-space: nowrap;
@@ -562,9 +562,6 @@ select:focus { border-color: var(--red); }
   .controls { flex-direction: column; align-items: stretch; gap: 8px; }
   .search-wrap { max-width: 100%; }
   .sort-wrap { margin-left: 0; }
-  /* Random btn: icon-only, don't stretch full width */
-  .random-btn { padding: 7px 10px; align-self: flex-start; }
-  .random-btn .random-label { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -595,16 +592,16 @@ select:focus { border-color: var(--red); }
         <option value="year-desc">年份 ↓</option>
         <option value="album">專輯 A–Z</option>
       </select>
+      <button class="random-btn" id="random-btn" title="隨機挑選一張專輯">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 3 21 3 21 8"></polyline>
+          <line x1="4" y1="20" x2="21" y2="3"></line>
+          <polyline points="21 16 21 21 16 21"></polyline>
+          <line x1="15" y1="15" x2="21" y2="21"></line>
+        </svg>
+        挑選
+      </button>
     </div>
-    <button class="random-btn" id="random-btn" title="隨機挑選一張專輯">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="16 3 21 3 21 8"></polyline>
-        <line x1="4" y1="20" x2="21" y2="3"></line>
-        <polyline points="21 16 21 21 16 21"></polyline>
-        <line x1="15" y1="15" x2="21" y2="21"></line>
-      </svg>
-      <span class="random-label">隨機</span>
-    </button>
   </div>
 </header>
 
