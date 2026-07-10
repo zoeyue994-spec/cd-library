@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CD Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface2: #f5f5f7;
+  --border: #e0e0e5;
+  --red: #fc3c44;
+  --red-light: #fff0f1;
+  --text: #1d1d1f;
+  --text-2: #6e6e73;
+  --text-3: #aeaeb2;
+  --tag-radius: 20px;
+  --radius: 12px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── HEADER ── */
+header {
+  background: rgba(245,245,247,0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 20px 32px 16px;
+}
+
+.header-row1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.pill-count {
+  background: var(--red);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Search */
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  max-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+input[type="text"] {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 12px 8px 32px;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type="text"]:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(252,60,68,0.1);
+}
+input[type="text"]::placeholder { color: var(--text-3); }
+
+/* Genre filter chips */
+.chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  flex: 1;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: var(--tag-radius);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+  user-select: none;
+}
+.chip:hover { border-color: #bbb; color: var(--text); }
+.chip.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+.chip-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.chip.active .chip-dot { background: rgba(255,255,255,0.7); }
+.chip-n {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Sort */
+.sort-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.sort-label { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+
+select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aeaeb2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+select:focus { border-color: var(--red); }
+
+/* ── RESULT INFO ── */
+.results-bar {
+  padding: 12px 32px 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 16px 32px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Cover */
+.cover-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #e8e8ed;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cover-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s;
+}
+.cover-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px;
+}
+.cover-placeholder .ph-note {
+  font-size: 28px; opacity: 0.25;
+}
+.cover-placeholder .ph-label {
+  font-size: 10px; color: var(--text-3);
+  text-align: center; padding: 0 12px;
+  line-height: 1.4;
+}
+
+/* Card body */
+.card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; }
+
+.card-artist {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-album {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.genre-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.card-year {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* Apple Music link button */
+.am-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--red-light);
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.12s;
+  align-self: flex-start;
+}
+.am-btn:hover { background: #ffdfe0; }
+.am-btn svg { flex-shrink: 0; }
+.no-link { display: none; }
+
+/* ── EMPTY ── */
+.empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-3);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty p { font-size: 14px; color: var(--text-2); margin-bottom: 4px; }
+.empty small { font-size: 12px; }
+
+/* ── GENRE COLOURS ── */
+:root {
+  --c-rock: #e05c3a; --c-metal: #b03020;
+  --c-jazz: #3a80b5; --c-cjazz: #2a70a5;
+  --c-alternative: #5a9a6a; --c-indie: #4a8a5a;
+  --c-ssw: #3a7a5a;
+  --c-electronic: #8855c0; --c-dance: #9f55d0;
+  --c-pop: #c85080; --c-jpop: #d05888;
+  --c-soundtrack: #c08030; --c-hiphop: #607070;
+  --c-mandopop: #d07040; --c-folk: #7a9a50;
+  --c-rb: #b06040; --c-indie-rock: #6a6aaa;
+  --c-indie-pop: #8a70bb; --c-other: #888888;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  header { padding: 16px; }
+  .grid { padding: 12px 16px; gap: 12px; }
+  .results-bar { padding: 10px 16px 0; }
+  h1 { font-size: 18px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .chip { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row1">
+    <h1>CD Library</h1>
+    <span class="pill-count" id="pill-count">64</span>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+      </svg>
+      <input type="text" id="search" placeholder="搜尋 artist 或專輯…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="chips-wrap" id="genre-chips"></div>
+    <div class="sort-wrap">
+      <span class="sort-label">排序</span>
+      <select id="sort-select">
+        <option value="artist">Artist A–Z</option>
+        <option value="year-asc">年份 ↑</option>
+        <option value="year-desc">年份 ↓</option>
+        <option value="album">專輯 A–Z</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<div class="results-bar" id="results-bar"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+// ── DATA ──
+// [Artist, Album, Year, Genre, Label, AppleMusicURL]
+const RAW = [
+  ["AC/DC","Highway to Hell","1979","Rock","Atlantic","https://music.apple.com/us/album/highway-to-hell/574043989"],
+  ["Adele","19 - Expanded Edition","2008","Pop","XL","https://music.apple.com/us/album/19/1544483491"],
+  ["Adele","21","2011","Pop","XL","https://music.apple.com/us/album/21/1544491232"],
+  ["Angus & Julia Stone","Down the Way","2010","Singer/Songwriter","EMI","https://music.apple.com/us/album/down-the-way/357607332"],
+  ["Angus & Julia Stone","Angus & Julia Stone","2014","Singer/Songwriter","Republic","https://music.apple.com/us/album/angus-julia-stone/1440859476"],
+  ["Angus & Julia Stone","Snow","2017","Alternative","Pias","https://music.apple.com/us/album/snow/1609038380"],
+  ["Arne Domnérus 等","Jazz at the Pawnshop (30th Anniversary)","1976","Jazz","Proprius","https://music.apple.com/us/album/jazz-at-the-pawnshop-30th-anniversary/305882422"],
+  ["Avril Lavigne","Let Go","2002","Pop","Arista","https://music.apple.com/us/album/let-go/315025768"],
+  ["Avril Lavigne","The Best Damn Thing","2007","Pop","RCA","https://music.apple.com/us/album/the-best-damn-thing/1443139002"],
+  ["Billie Eilish","HIT ME HARD AND SOFT","2024","Alternative","Interscope","https://music.apple.com/us/album/hit-me-hard-and-soft/1739659134"],
+  ["Black Sabbath","Iron Man: The Best of Black Sabbath","2012","Metal","Universal","https://music.apple.com/us/album/iron-man-the-best-of-black-sabbath/571799490"],
+  ["Calvin Harris","Funk Wav Bounces Vol. 1","2017","Dance","Columbia","https://music.apple.com/us/album/funk-wav-bounces-vol-1/1440833081"],
+  ["Chilli Beans.","Chilli Beans.","2022","J-Pop","A.S.A.B","https://music.apple.com/us/album/chilli-beans/1629402603"],
+  ["Chilli Beans.","For you","2022","J-Pop","A.S.A.B",""],
+  ["The Cranberries","No Need to Argue","1994","Rock","Island","https://music.apple.com/us/album/no-need-to-argue/718631023"],
+  ["The Dave Brubeck Quartet","Time Out","1959","Jazz","Columbia","https://music.apple.com/us/album/time-out/268447948"],
+  ["Deep Purple","Made in Japan","1972","Rock","WMG","https://music.apple.com/us/album/made-in-japan-deluxe-edition-live/879738770"],
+  ["The Doors","The Doors","2000","Rock","Elektra","https://music.apple.com/us/album/the-doors/718655784"],
+  ["Dream Theater","Images and Words","1992","Metal","Atlantic","https://music.apple.com/us/album/images-and-words/1440833774"],
+  ["Dream Theater","Metropolis Pt. 2: Scenes from a Memory","1999","Metal","WMG","https://music.apple.com/us/album/metropolis-pt-2-scenes-from-a-memory/1440839126"],
+  ["Foster the People","Sacred Hearts Club","2017","Alternative","Columbia","https://music.apple.com/us/album/sacred-hearts-club/1222827960"],
+  ["藤井風 Fujii Kaze","HELP EVER HURT NEVER","2020","J-Pop","Universal","https://music.apple.com/us/album/help-ever-hurt-never/1505498769"],
+  ["Hiromi","BLUE GIANT","2023","Jazz","Universal","https://music.apple.com/us/album/blue-giant-original-motion-picture-soundtrack/1667443039"],
+  ["Jack Johnson","Curious George","2006","Soundtrack","Republic","https://music.apple.com/us/album/sing-a-longs-and-lullabies-for-the-film/1424723863"],
+  ["James Blunt","All the Lost Souls (Deluxe)","2008","Pop Rock","WMG","https://music.apple.com/us/album/all-the-lost-souls-deluxe-edition/1615822765"],
+  ["大竹研 Ken Ohtake","KEN","2019","Alternative","Now Music",""],
+  ["Led Zeppelin","IV (Remastered)","1971","Rock","WMG","https://music.apple.com/us/album/led-zeppelin-iv-remastered/580708175"],
+  ["The Marías","CINEMA","2021","Alternative","Atlantic","https://music.apple.com/us/album/cinema/1563957170"],
+  ["Makoto Okazaki","Sea","2015","Alternative","自發行",""],
+  ["Matt Maltese","Hers","2025","Alternative","The Orchard","https://music.apple.com/us/album/hers/1795998438"],
+  ["Men I Trust","Oncle Jazz","2019","Pop","自發行","https://music.apple.com/us/album/oncle-jazz/1473993015"],
+  ["Miles Davis","Sketches of Spain","1960","Jazz","Columbia","https://music.apple.com/us/album/sketches-of-spain/832060615"],
+  ["Pink Floyd","The Wall","1979","Rock","EMI","https://music.apple.com/us/album/the-wall/1065975633"],
+  ["Rachael Yamagata","Porch Songs","2018","Singer/Songwriter","SME","https://music.apple.com/us/album/porch-songs-ep/1438281504"],
+  ["Rhye","Woman","2013","Electronic","Polydor","https://music.apple.com/us/album/woman/594780694"],
+  ["The Roots","How I Got Over","2010","Hip-Hop","Def Jam","https://music.apple.com/us/album/how-i-got-over/1440733756"],
+  ["福居良 Ryo Fukui","Scenery（2005 重發）","1976 / 2005","Jazz","SOLID","https://music.apple.com/us/album/scenery/1329457232"],
+  ["福居良 Ryo Fukui","Mellow Dream（2016 版）","2006","Jazz","SOLID","https://music.apple.com/us/album/mellow-dream/1329458465"],
+  ["福居良 Ryo Fukui","Scenery (1976)","2022","Jazz","SOLID","https://music.apple.com/us/album/scenery/1329457232"],
+  ["福居良 Ryo Fukui","Best of Ryo Fukui","2022","Jazz","SOLID",""],
+  ["Sampha","Process","2017","Electronic","Young Turks","https://music.apple.com/us/album/process/1138217713"],
+  ["Stan Getz and Joao Gilberto","Getz/Gilberto","2014","Jazz","WMG","https://music.apple.com/us/album/getz-gilberto/268463560"],
+  ["Theodore Shapiro","Severance: Season 2 OST","2025","Soundtrack","Lakeshore","https://music.apple.com/us/album/severance-season-2-apple-tv-original-series-soundtrack/1803471256"],
+  ["Two Door Cinema Club","Tourist History","2010","Alternative","Kitsuné","https://music.apple.com/us/album/tourist-history/1495494440"],
+  ["Two Door Cinema Club","Beacon","2012","Alternative","PIAS","https://music.apple.com/us/album/beacon/1771724783"],
+  ["Two Door Cinema Club","Gameshow","2016","Alternative","Parlophone","https://music.apple.com/us/album/gameshow-deluxe-edition/1771717901"],
+  ["The Who","Greatest Hits","2009","Rock","Geffen","https://music.apple.com/us/album/greatest-hits/1422668723"],
+  ["Wynton Marsalis & Eric Clapton","Play the Blues","2011","Jazz","Reprise",""],
+  ["方大同 Khalil Fong","15","2011","華語流行樂","Warner Music","https://music.apple.com/us/album/15/540055014"],
+  ["方大同 Khalil Fong","夢想家","2024","華語流行樂","FU Music","https://music.apple.com/us/album/the-dreamer/1772124855"],
+  ["蛋堡 Soft Lipa","收斂水","2009","華語嘻哈","顏社","https://music.apple.com/tw/album/%E6%94%B6%E6%96%82%E6%B0%B4/1178538439"],
+  ["蛋堡 Soft Lipa","Winter Sweet","2009","華語嘻哈","顏社","https://music.apple.com/hk/album/winter-sweet/1172719989"],
+  ["草東沒有派對","醜奴兒","2016","獨立搖滾","自發行","https://music.apple.com/tw/album/%E9%86%9C%E5%A5%B4%E5%85%92/1676735354"],
+  ["巨大的轟鳴","登鸛雀樓 – EP","2014","獨立搖滾","SME",""],
+  ["國蛋 GorDoN","GDNA","2023","華語嘻哈","顏社","https://music.apple.com/tw/album/gdna/1671993254"],
+  ["生祥樂隊","菊花夜行軍：15週年紀念演唱會現場錄音","2017","台灣民謠","大大樹","https://music.apple.com/tw/album/%E8%8F%8A%E8%8A%B1%E5%A4%9C%E8%A1%8C%E8%BB%8D-15%E9%80%B1%E5%B9%B4%E5%85%A8%E6%96%B0%E6%B7%B7%E9%9F%B3%E7%89%88/1240790450"],
+  ["謊言留聲機","未來雛形","2012","電子音樂","亞神","https://music.apple.com/tw/album/%E6%9C%AA%E4%BE%86%E9%9B%9B%E5%BD%A2/1861428154"],
+  ["李英宏","台北直直撞","2016","華語流行樂","顏社","https://music.apple.com/tw/album/%E5%8F%B0%E5%8C%97%E7%9B%B4%E7%9B%B4%E6%92%9E/1112089754"],
+  ["盧廣仲 Crowd Lu","這就是Rock'N Roll 的Style Live in TICC","2009","華語流行樂","添翼音樂","https://music.apple.com/gb/album/live-in-ticc-%E9%80%99%E5%B0%B1%E6%98%AFrockn-roll%E7%9A%84style/799309368"],
+  ["東京中央線","Fly by Light","2020","Contemporary Jazz","Foothills Folk LLC",""],
+  ["陳嫺靜","如果每天都可以 happy happy 誰想要sad:*合作的秘密","2025","華語嘻哈","顏社","https://music.apple.com/us/album/%E5%A6%82%E6%9E%9C%E6%AF%8F%E5%A4%A9%E9%83%BD%E5%8F%AF%E4%BB%A5-happy-happy-%E8%AA%B0%E6%83%B3%E8%A6%81sad-%E4%B8%80%E8%B5%B7%E5%8E%BB%E5%BA%A6%E5%81%87/1799903617"],
+  ["伍佰 & China Blue","釘子花","2016","華語搖滾","Universal Music Taiwan","https://music.apple.com/tw/album/%E9%87%98%E5%AD%90%E8%8A%B1/1443156439"],
+  ["裝咖人","夜官巡場","2021","獨立流行樂","風潮音樂","https://music.apple.com/tw/album/%E5%A4%9C%E5%AE%98%E5%B7%A1%E5%A0%B4/1594803360"],
+];
+
+// ── Genre colour map ──
+const GENRE_META = {
+  "Rock":           { cls:"rock",    color:"#e05c3a" },
+  "Metal":          { cls:"metal",   color:"#b03020" },
+  "Jazz":           { cls:"jazz",    color:"#3a80b5" },
+  "Contemporary Jazz":{ cls:"cjazz", color:"#2a70a5" },
+  "Alternative":    { cls:"alt",     color:"#5a9a6a" },
+  "Singer/Songwriter":{ cls:"ssw",   color:"#3a7a5a" },
+  "Electronic":     { cls:"elec",    color:"#8855c0" },
+  "電子音樂":        { cls:"elec",    color:"#8855c0" },
+  "Dance":          { cls:"dance",   color:"#9f55d0" },
+  "Pop":            { cls:"pop",     color:"#c85080" },
+  "Pop Rock":       { cls:"pop",     color:"#c85080" },
+  "J-Pop":          { cls:"jpop",    color:"#d05888" },
+  "Soundtrack":     { cls:"sndtrk",  color:"#c08030" },
+  "Hip-Hop":        { cls:"hiphop",  color:"#607070" },
+  "華語嘻哈":        { cls:"hiphop",  color:"#607070" },
+  "台灣民謠":        { cls:"folk",    color:"#7a9a50" },
+  "獨立搖滾":        { cls:"indierock",color:"#6a6aaa" },
+  "華語搖滾":        { cls:"rock",    color:"#e05c3a" },
+  "華語流行樂":      { cls:"mandopop",color:"#d07040" },
+  "獨立流行樂":      { cls:"indiepop",color:"#8a70bb" },
+};
+const genreMeta = g => GENRE_META[g] || { cls:"other", color:"#888888" };
+
+// ── Parse ──
+const data = RAW.map(([artist, album, year, genre, label, url]) => ({
+  artist, album, year, genre, label, url,
+  meta: genreMeta(genre),
+  sortArtist: artist.replace(/^(The |A |An )/i,'').toLowerCase(),
+  sortYear: parseInt(year) || 0,
+}));
+
+// ── Unique genres by count ──
+const genreCount = {};
+data.forEach(d => { genreCount[d.genre] = (genreCount[d.genre]||0)+1; });
+const genres = Object.entries(genreCount).sort((a,b)=>b[1]-a[1]).map(([g])=>g);
+
+// ── Build genre chips ──
+let activeGenres = new Set();
+const chipsWrap = document.getElementById('genre-chips');
+genres.forEach(g => {
+  const m = genreMeta(g);
+  const btn = document.createElement('button');
+  btn.className = 'chip';
+  btn.dataset.genre = g;
+  btn.innerHTML = `<span class="chip-dot" style="background:${m.color}"></span>${g}<span class="chip-n">${genreCount[g]}</span>`;
+  btn.addEventListener('click', () => {
+    if (activeGenres.has(g)) { activeGenres.delete(g); btn.classList.remove('active'); }
+    else { activeGenres.add(g); btn.classList.add('active'); }
+    render();
+  });
+  chipsWrap.appendChild(btn);
+});
+
+// ── Search & sort ──
+let searchVal = '';
+let sortMode = 'artist';
+document.getElementById('search').addEventListener('input', e => { searchVal = e.target.value.trim().toLowerCase(); render(); });
+document.getElementById('sort-select').addEventListener('change', e => { sortMode = e.target.value; render(); });
+
+// ── Apple Music icon SVG ──
+const AM_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.048-2.31-2.07-3.051A5.022 5.022 0 0019.7.41c-.504-.095-1.01-.14-1.517-.15L17.9.25h-12l-.3.01c-.477.01-.953.05-1.423.13a4.93 4.93 0 00-1.94.75A5.017 5.017 0 00.807 3.77a5.04 5.04 0 00-.56 1.69c-.09.494-.135.994-.145 1.496L.1 7.2v9.6l.01.3c.01.476.05.953.13 1.423.17.985.58 1.864 1.21 2.594a5.03 5.03 0 002.93 1.726c.504.095 1.01.14 1.517.15l.283.007h12l.3-.01c.476-.01.953-.05 1.423-.13a4.93 4.93 0 001.94-.75 5.014 5.014 0 001.38-1.63 5.04 5.04 0 00.56-1.69c.09-.494.135-.994.145-1.496l.007-.284V7.2l-.01-.3a9.397 9.397 0 00-.13-1.476zM17 9H9V7.25l8-.01V9zm-3.5 7.5A1.5 1.5 0 1112 18a1.5 1.5 0 011.5-1.5zm1.5-3v-4.5H9V17H7.5V7h10v3.5H15v4c0 .83-.67 1.5-1.5 1.5z"/></svg>`;
+
+// ── Render ──
+function render() {
+  let items = data.filter(d => {
+    if (activeGenres.size > 0 && !activeGenres.has(d.genre)) return false;
+    if (searchVal) {
+      const hay = (d.artist+d.album+d.genre+d.label).toLowerCase();
+      if (!hay.includes(searchVal)) return false;
+    }
+    return true;
+  });
+
+  items = [...items].sort((a,b) => {
+    if (sortMode==='artist')    return a.sortArtist.localeCompare(b.sortArtist);
+    if (sortMode==='year-asc')  return a.sortYear - b.sortYear;
+    if (sortMode==='year-desc') return b.sortYear - a.sortYear;
+    if (sortMode==='album')     return a.album.localeCompare(b.album);
+    return 0;
+  });
+
+  const total = data.length;
+  document.getElementById('pill-count').textContent = items.length === total ? total : `${items.length}/${total}`;
+  document.getElementById('results-bar').textContent =
+    items.length === total ? `${total} 張` : `顯示 ${items.length} / ${total} 張`;
+
+  const grid = document.getElementById('grid');
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🎵</div><p>找不到結果</p><small>試試其他搜尋或清除篩選</small></div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(d => {
+    const m = d.meta;
+    const tagStyle = `background:${m.color}18;color:${m.color};`;
+    const amBtn = d.url
+      ? `<a class="am-btn" href="${d.url}" target="_blank" rel="noopener">${AM_ICON} 在 Apple Music 開啟</a>`
+      : '';
+    return `
+    <div class="card">
+      <div class="cover-wrap" data-artist="${esc(d.artist)}" data-album="${esc(d.album)}">
+        <div class="cover-placeholder">
+          <span class="ph-note">♪</span>
+          <span class="ph-label">${esc(d.artist)}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-artist">${esc(d.artist)}</div>
+        <div class="card-album">${esc(d.album)}</div>
+        <div class="card-meta">
+          <span class="genre-chip" style="${tagStyle}">${esc(d.genre)}</span>
+          <span class="card-year">${esc(d.year)}</span>
+        </div>
+        ${amBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  // lazy-load covers via MusicBrainz + Cover Art Archive
+  loadCovers();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Cover loading ──
+const coverCache = {};
+
+async function loadCovers() {
+  const wraps = document.querySelectorAll('.cover-wrap[data-artist]');
+  for (const wrap of wraps) {
+    const artist = wrap.dataset.artist;
+    const album  = wrap.dataset.album;
+    const key    = artist + '||' + album;
+
+    if (coverCache[key]) {
+      setCover(wrap, coverCache[key]);
+      continue;
+    }
+    if (coverCache[key] === null) continue; // already failed
+
+    // stagger requests
+    await sleep(120);
+    fetchCover(wrap, artist, album, key);
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function fetchCover(wrap, artist, album, key) {
+  try {
+    // clean up album title for search (remove parenthetical notes)
+    const cleanAlbum = album.replace(/\(.*?\)/g,'').replace(/（.*?）/g,'').trim();
+    const q = encodeURIComponent(`artist:"${artist}" release:"${cleanAlbum}"`);
+    const mbRes = await fetch(
+      `https://musicbrainz.org/ws/2/release/?query=${q}&fmt=json&limit=3`,
+      { headers: { 'User-Agent': 'CDLibrary/1.0 (personal-collection)' } }
+    );
+    if (!mbRes.ok) { coverCache[key] = null; return; }
+
+    const mbData = await mbRes.json();
+    if (!mbData.releases?.length) { coverCache[key] = null; return; }
+
+    const mbid = mbData.releases[0].id;
+    await sleep(80);
+
+    const caaRes = await fetch(`https://coverartarchive.org/release/${mbid}`);
+    if (!caaRes.ok) { coverCache[key] = null; return; }
+
+    const caaData = await caaRes.json();
+    const front = caaData.images?.find(i => i.front) ?? caaData.images?.[0];
+    if (!front) { coverCache[key] = null; return; }
+
+    const imgUrl = front.thumbnails?.['500'] ?? front.thumbnails?.large ?? front.image;
+    coverCache[key] = imgUrl;
+
+    // find the wrap again (might have re-rendered)
+    const live = document.querySelector(`.cover-wrap[data-artist="${CSS.escape(artist)}"][data-album="${CSS.escape(album)}"]`);
+    if (live) setCover(live, imgUrl);
+
+  } catch(e) { coverCache[key] = null; }
+}
+
+function setCover(wrap, url) {
+  if (!url) return;
+  const existing = wrap.querySelector('img');
+  if (existing) return;
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = wrap.dataset.album;
+  img.loading = 'lazy';
+  img.onerror = () => img.remove();
+  img.onload = () => {
+    const ph = wrap.querySelector('.cover-placeholder');
+    if (ph) ph.style.display = 'none';
+  };
+  wrap.appendChild(img);
+}
+
+render();
+</script>
+</body>
+</html>
