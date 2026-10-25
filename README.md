@@ -20,7 +20,7 @@
 - Header 排序選單右側有「挑選」按鈕
 - 點擊後跳出 Modal，以**滾輪動畫**（slot machine）翻過多張封面後減速停在抽中的專輯
 - 採用 **Shuffle Bag**（無放回抽樣）機制：
-  - 每輪 64 張專輯各出現恰好一次，機率完全均等
+  - 每輪所有專輯各出現恰好一次，機率完全均等
   - 全部抽完才重新洗牌，進入下一輪
 - Modal 內可點「再挑一張」繼續抽，或點「 Apple Music」直接開啟
 
@@ -66,4 +66,4 @@ xdg-open index.html    # Linux
 
 ## 目前收藏數量
 
-63 張，橫跨 Rock、Metal、Jazz、Alternative、Electronic、J-Pop、華語流行樂、獨立搖滾等曲風。
+69 張，橫跨 Rock、Metal、Jazz、Alternative、Electronic、J-Pop、華語流行樂、獨立搖滾等曲風。
